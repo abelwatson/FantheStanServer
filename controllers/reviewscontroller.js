@@ -42,7 +42,9 @@ router.put("/:id", validateJWT, async (req, res) => {
 
     try {
         const update = await ReviewsModel.update(updateReview, query);
-        res.status(200).json(update);
+        res.status(200).json({
+            message: `Review has been updated.`
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

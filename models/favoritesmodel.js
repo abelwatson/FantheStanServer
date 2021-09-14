@@ -2,11 +2,7 @@ const { DataTypes } = require('sequelize');
 const db = require('../db');
 
 const FavoritesModel = db.define('favorites', {
-    HeroVillain: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    review: {
+    heroVillain: {
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -18,14 +14,6 @@ const FavoritesModel = db.define('favorites', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    like: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-    },
-    dislike: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    }
 });
 
 module.exports = FavoritesModel;

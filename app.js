@@ -17,8 +17,8 @@ app.use("/test", (req, res) => {
 
 app.use(require("./middleware/validation"));
 
-// app.use("/favorites", controllers.favoritesController);
 app.use("/reviews", controllers.reviewsController);
+// app.use("/favorites", controllers.favoritesController);
 
 dbConnection.authenticate()
     .then(() => dbConnection.sync(
