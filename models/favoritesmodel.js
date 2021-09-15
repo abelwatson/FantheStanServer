@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const db = require('../db');
 
 const FavoritesModel = db.define('favorites', {
-    heroVillain: {
+    HeroVillain: {
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -13,7 +13,7 @@ const FavoritesModel = db.define('favorites', {
     ownerID: {
         type: DataTypes.INTEGER,
         allowNull: false,
-    },
+    }
 });
 
 module.exports = FavoritesModel;

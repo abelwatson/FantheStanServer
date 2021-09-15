@@ -2,14 +2,14 @@ const router = require('express').Router();
 const { FavoritesModel } = require('../models');
 let validateJWT = require('../middleware/validation');
 
-// New Favorite Item
+//Add to Favorites
 router.post("/create", validateJWT, async (req, res) => {
     const { heroVillain, imageURL } = await req.body.favorites;
-    const id = req.user.id;
+    const { id } = req.user;
     const addFavorite = {
         heroVillain,
         imageURL,
-        ownerId: id
+        ownerID: id
     }
     try {
         const newFavorite = await FavoritesModel.create(addFavorite);
@@ -22,7 +22,7 @@ router.post("/create", validateJWT, async (req, res) => {
 
 // Get Favorites
 router.get("/mine", validateJWT, async (req, res) => {
-    const id = req.user.id;
+    const { id } = req.user;
     try {
         const userFavorites = await FavoritesModel.findAll({
             where: {
@@ -44,7 +44,7 @@ router.delete("/:id", validateJWT, async (req, res) => {
         const query = {
             where: {
                 id: favoritesId,
-                ownerId: ownerId
+                ownerID: ownerId
             }
         };
 

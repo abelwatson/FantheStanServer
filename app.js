@@ -3,6 +3,7 @@ const Express = require("express");
 const app = Express();
 const dbConnection = require("./db");
 
+
 app.use(require('./middleware/headers'));
 
 const controllers = require("./controllers");
@@ -18,7 +19,7 @@ app.use("/test", (req, res) => {
 app.use(require("./middleware/validation"));
 
 app.use("/reviews", controllers.reviewsController);
-// app.use("/favorites", controllers.favoritesController);
+app.use("/favorites", controllers.favoritesController);
 
 dbConnection.authenticate()
     .then(() => dbConnection.sync(
@@ -26,7 +27,7 @@ dbConnection.authenticate()
         ))
     .then(() => {
         app.listen(process.env.PORT, () => {
-            console.log(`[Server]: App is listening on 3000.`);
+            console.log(`[Server]: App is listening on ${process.env.PORT}.`);
         });
     })
     .catch((err) => {

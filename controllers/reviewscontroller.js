@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const ReviewsModel = require('../models/reviewsmodel');
+const ReviewsModel = require('../models');
 let validateJWT = require('../middleware/validation');
 
 //New Review
@@ -16,7 +16,6 @@ router.post('/create', validateJWT, async (req, res) => {
     }
     try {
         const newReview = await ReviewsModel.create(logReview);
-        console.log(newReview);
         res.status(200).json(newReview)
     } catch (err) {
         res.status(500).json({ error: err.message });
