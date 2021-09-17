@@ -1,20 +1,42 @@
 const router = require('express').Router();
-const { FavoritesModel } = require('../models');
+const { FavoritesModel, UserModel, AdminModel } = require('../models');
 let validateJWT = require('../middleware/validation');
 
 //Add to Favorites
 router.post("/create", validateJWT, async (req, res) => {
     const { heroVillain, imageURL } = await req.body.favorites;
-    const { id } = req.user;
-    const addFavorite = {
+    const { id, role } = req.user;
+    const logFavorite = {
         heroVillain,
         imageURL,
         ownerID: id
     }
     try {
-        const newFavorite = await FavoritesModel.create(addFavorite);
-        console.log(newFavorite);
-        res.status(200).json(newFavorite)
+        if (role === 'basic') {
+            let User = await UserModel.findOne({ where: { id: id } });
+
+            if (User) {
+                let userFavorite = await FavoritesModel.create(logFavorite);
+                await User.addFavorite(userFavorite)
+
+                res.status(200).json({
+                    message: "User Favorite Successful"
+                });
+            } else if (role === 'Admin') {
+                let User = await AdminModel.findOne({
+                    where: { id: id }
+                });
+
+                if (User) {
+                    let userFavorite = await FavoritesModel.create(logFavorite);
+                    await User.addFav(userFavorite);
+
+                    res.status(200).json({
+                        message: "Admin Favorite Created"
+                    })
+                }
+            }
+        }
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -22,14 +44,42 @@ router.post("/create", validateJWT, async (req, res) => {
 
 // Get Favorites
 router.get("/mine", validateJWT, async (req, res) => {
-    const { id } = req.user;
+    const { id, role } = req.user;
     try {
-        const userFavorites = await FavoritesModel.findAll({
-            where: {
-                ownerId: id
+        if (role === 'basic') {
+            let User = await UserModel.findOne({
+                where: { id: id }
+            })
+
+            if (User) {
+                const userFavorite = await FavoritesModel.findAll({
+                    where: {
+                        ownerId: id
+                    }
+                });
+                res.status(200).json({
+                    message: "Retrieved User Favorites",
+                    userFavorite
+                });
             }
-        });
-        res.status(200).json(userFavorites);
+        } else if (role === 'Admin') {
+            let User = await AdminModel.findOne({
+                where: { id: id }
+            })
+
+            if (User) {
+                const userFavorite = await FavoritesModel.findAll({
+                    where: {
+                        ownerId: id
+                    }
+                });
+
+                res.status(200).json({
+                    message: "Retrieved Admin Favorites",
+                    userFavorite
+                });
+            }
+        }
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -37,21 +87,43 @@ router.get("/mine", validateJWT, async (req, res) => {
 
 // Delete Favorites Item
 router.delete("/:id", validateJWT, async (req, res) => {
-    const ownerId = req.user.id;
+    const { id, role } = req.user.id;
     const favoritesId = req.params.id;
 
     try {
-        const query = {
-            where: {
-                id: favoritesId,
-                ownerID: ownerId
-            }
-        };
+        if (role === 'basic') {
+            let User = await AdminModel.findOne({
+                where: { id: id }
+            });
 
-        await FavoritesModel.destroy(query);
-        res.status(200).json({ message: "Character removed from your favorites!"});
+            if (User) {
+                const query = {
+                    where: {
+                        id: favoritesId,
+                        ownerID: id
+                    }
+                };
+
+                await FavoritesModel.destroy(query);
+                res.status(200).json({ message: "User Favorites Removed!" });
+            }
+        } else if (role === 'Admin') {
+            let User = await AdminModel.findOne({
+                where: { id: id }
+            });
+
+            if (User) {
+                const query = {
+                    where: {
+                        id: favoritesId
+                    }
+                };
+                await FavoritesModel.destroy(query);
+                res.status(200).json({ message: "Favorites Removed!" });
+            }
+        }
     } catch (err) {
-        res.status(500).json({error: err.message});
+        res.status(500).json({ error: err.message });
     }
 });
 

@@ -1,11 +1,11 @@
 const router = require('express').Router();
-const ReviewsModel = require('../models');
+const { ReviewsModel, UserModel, AdminModel } = require('../models');
 let validateJWT = require('../middleware/validation');
 
-//New Review
+//New Reviews
 router.post('/create', validateJWT, async (req, res) => {
     const { heroVillain, review, imageURL, like, dislike } = req.body.review
-    const { id } = req.user;
+    const { id, role } = req.user;
     const logReview = {
         heroVillain,
         review,
@@ -15,8 +15,31 @@ router.post('/create', validateJWT, async (req, res) => {
         ownerID: id
     }
     try {
-        const newReview = await ReviewsModel.create(logReview);
-        res.status(200).json(newReview)
+        if (role === 'basic') {
+            let User = await UserModel.findOne({ where: { id: id } });
+
+            if (User) {
+                let userReview = await ReviewsModel.create(logReview);
+                await User.addReview(userReview)
+
+                res.status(200).json({
+                    message: "Review Successful"
+                });
+            } else if (role === 'Admin') {
+                let User = await AdminModel.findOne({
+                    where: { id: id }
+                });
+
+                if (User) {
+                    let userReview = await ReviewsModel.create(logReview);
+                    await User.addReview(userReview);
+
+                    res.status(200).json({
+                        message: "Admin Review Created"
+                    })
+                }
+            }
+        }
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -26,24 +49,39 @@ router.post('/create', validateJWT, async (req, res) => {
 router.put("/:id", validateJWT, async (req, res) => {
     const { review } = await req.body.review;
     const reviewId = req.params.id;
-    const userId = req.user.id;
-
-    const query = {
-        where: {
-            id: reviewId,
-            ownerID: userId
-        }
-    };
-
-    const updateReview = {
-        review: review
-    };
+    const { id, role } = req.user.id;
 
     try {
-        const update = await ReviewsModel.update(updateReview, query);
-        res.status(200).json({
-            message: `Review has been updated.`
-        });
+        if (role === 'basic') {
+            const updateReview = {
+                review: review
+            }
+
+            const query = {
+                where: {
+                    id: reviewId,
+                    ownerID: id
+                }
+            };
+            
+            await ReviewsModel.update(updateReview, query);
+
+            res.status(200).json({
+                message: `Review has been updated.`
+            });
+        } else if ( role === 'Admin') {
+            const updateReview = {
+                review: review
+            }
+
+            const query = {
+                where: {
+                    id: reviewId,
+                }
+            };
+            
+            await ReviewsModel.update(updateReview, query);
+        }
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -51,19 +89,42 @@ router.put("/:id", validateJWT, async (req, res) => {
 
 // Delete Review
 router.delete("/delete/:id", validateJWT, async (req, res) => {
-    const ownerID = req.user.id;
+    const { id, role } = req.user.id;
     const reviewId = req.params.id;
 
     try {
-        const query = {
-            where: {
-                id: reviewId,
-                ownerID: ownerID
-            }
-        };
+        if (role === 'basic') {
+            let User = await UserModel.findOne({
+                where: { id: id }
+            });
+            
+            if (User) {
+                const query = {
+                    where: {
+                        id: reviewId,
+                        ownerID: id
+                    }
+                };
 
-        await ReviewsModel.destroy(query);
-        res.status(200).json({ message: "Review Entry Removed" });
+                await ReviewsModel.destroy(query);
+                res.status(200).json({ message: "Review Entry Removed" });
+            }
+        } else if (role === 'Admin') {
+            let User = await AdminModel.findOne({
+                where: { id: id }
+            });
+
+            if (User) {
+                const query = {
+                    where: {
+                        id: reviewId
+                    }
+                };
+
+                await ReviewsModel.destroy(query);
+                res.status(200).json({ message: "Review Entry Removed" });
+            }
+        }
     } catch (err) {
         res.status(500).json({ error: err });
     }

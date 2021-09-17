@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const UserModel = sequelize.define('user', {
+    const AdminModel = sequelize.define("admin", {
         email: {
             type: DataTypes.STRING(100),
             allowNull: false,
@@ -14,5 +14,5 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         }
     })
-    return UserModel
+    return AdminModel
 }
