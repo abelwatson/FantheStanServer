@@ -1,19 +1,17 @@
-const { DataTypes } = require('sequelize');
-const db = require('../db');
-
-const FavoritesModel = db.define('favorites', {
-    HeroVillain: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    imageURL: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    ownerID: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    }
-});
-
-module.exports = FavoritesModel;
+module.exports = (sequelize, DataTypes) => {
+    const FavoritesModel = sequelize.define("favorites", {
+        heroVillain: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        imageURL: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        ownerID: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        }
+    })
+    return FavoritesModel
+}

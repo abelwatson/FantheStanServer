@@ -1,20 +1,20 @@
 const router = require("express").Router();
-const { UserModel } = require("../models");
+const { AdminModel } = require("../models");
 const { UniqueConstraintError } = require("sequelize/lib/errors");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 router.post("/register", async (req, res) => {
-    const { email, password, } = req.body.user;
-    const userRole = 'basic';
+    const { email, password } = req.body.user;
+    const userRole = 'Admin';
     try{
-        const User = await UserModel.create({
+        const User = await AdminModel.create({
             email,
             password: bcrypt.hashSync(password, 13),
             role: userRole
     });
 
-    let token = jwt.sign({ id: User.id, role: userRole}, process.env.JWT_SECRET, {expiresIn: 60 * 60 * 24});
+    let token = jwt.sign({ id: User.id, role: userRole }, process.env.JWT_SECRET, {expiresIn: 60 * 60 * 24});
 
     res.status(201).json({
         message: "User successfully registered",
@@ -37,7 +37,7 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
     let { email, password } = req.body.user;
     try {
-        const loginUser = await UserModel.findOne({
+        const loginUser = await AdminModel.findOne({
             where: {
                 email: email,
             },

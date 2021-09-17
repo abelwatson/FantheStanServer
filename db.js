@@ -1,19 +1,16 @@
 require("dotenv").config();
-const Sequelize = require('sequelize');
+const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
+const sequelize = new Sequelize( 
+    process.env.DB_DBNAME,
+    process.env.DB_USER,
+    process.env.DB_PASS,
+    {
+    host: process.env.DB_HOST,
     dialect: 'postgres',
-    ssl: process.env.ENVIRONMENT === 'production'
-    // dialectOptions: {
-    //     ssl: {
-    //         require: true,
-    //         rejectUnauthorized: false,
-    //     }
-    // }
 });
 
-// const Express = require("express");
 
 
 
-module.exports = sequelize;
+module.exports = { sequelize };
