@@ -1,11 +1,11 @@
 const router = require("express").Router();
-const { UserModel } = require("../models");
+const { UserModel, AdminModel } = require("../models");
 const { UniqueConstraintError } = require("sequelize/lib/errors");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 router.post("/register", async (req, res) => {
-    const { email, password, } = req.body.user;
+    const { email, password } = req.body.user;
     const userRole = 'basic';
     try{
         const User = await UserModel.create({
@@ -36,6 +36,7 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
     let { email, password } = req.body.user;
+    
     try {
         const loginUser = await UserModel.findOne({
             where: {
