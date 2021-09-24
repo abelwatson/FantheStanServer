@@ -46,41 +46,47 @@ router.post('/create', validateJWT, async (req, res) => {
 });
 
 // Update Review
-router.put("/:id", validateJWT, async (req, res) => {
+router.put("/update/:id", validateJWT, async (req, res) => {
     const { review } = await req.body.review;
     const reviewId = req.params.id;
     const { id, role } = req.user.id;
 
     try {
         if (role === 'basic') {
-            const updateReview = {
-                review: review
-            }
+            let User = await UserModel.findOne({ where: { id: id } });
 
-            const query = {
-                where: {
-                    id: reviewId,
-                    ownerID: id
+            if (User) {
+                const updateReview = {
+                    review: review
+                }
+                const query = {
+                    where: {
+                        id: reviewId,
+                        ownerID: id
+                    }
+                }
+                await ReviewsModel.update(updateReview, query);
+                res.status(200).json({
+                    message: `Review has been updated.`
+                });
+            } else if (role === 'Admin') {
+                let User = await AdminModel.findOne({ where: { id: id }})
+
+                if (User) {
+                    const updateReview = {
+                        review: review
+                    }
+                    const query = {
+                        where: {
+                            id: reviewId,
+                        }
+                    };
+                    await ReviewsModel.update(updateReview, query);
+                    res.status(200).json({
+                        message: `Admin review has been updated.`
+                    });
                 }
             };
-            
-            await ReviewsModel.update(updateReview, query);
-
-            res.status(200).json({
-                message: `Review has been updated.`
-            });
-        } else if ( role === 'Admin') {
-            const updateReview = {
-                review: review
-            }
-
-            const query = {
-                where: {
-                    id: reviewId,
-                }
-            };
-            
-            await ReviewsModel.update(updateReview, query);
         }
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -97,7 +103,7 @@ router.delete("/delete/:id", validateJWT, async (req, res) => {
             let User = await UserModel.findOne({
                 where: { id: id }
             });
-            
+
             if (User) {
                 const query = {
                     where: {

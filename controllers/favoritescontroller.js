@@ -86,7 +86,7 @@ router.get("/mine", validateJWT, async (req, res) => {
 });
 
 // Delete Favorites Item
-router.delete("/:id", validateJWT, async (req, res) => {
+router.delete("/delete/:id", validateJWT, async (req, res) => {
     const { id, role } = req.user.id;
     const favoritesId = req.params.id;
 

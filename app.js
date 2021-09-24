@@ -6,10 +6,10 @@ const controllers = require("./controllers");
 
 app.use(Express.json());
 
+app.use(require('./middleware/headers'));
 app.use("/user", controllers.userController);
 app.use("/admin", controllers.adminController);
 
-app.use(require('./middleware/headers'));
 app.use(require("./middleware/validation"));
 
 app.use("/review", controllers.reviewsController);
