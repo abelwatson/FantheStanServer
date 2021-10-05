@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         imageURL: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
         like: {
             type: DataTypes.INTEGER,

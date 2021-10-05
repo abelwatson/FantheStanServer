@@ -54,7 +54,7 @@ router.get("/mine", validateJWT, async (req, res) => {
             if (User) {
                 const userFavorite = await FavoritesModel.findAll({
                     where: {
-                        ownerId: id
+                        id: id
                     }
                 });
                 res.status(200).json({
@@ -70,7 +70,7 @@ router.get("/mine", validateJWT, async (req, res) => {
             if (User) {
                 const userFavorite = await FavoritesModel.findAll({
                     where: {
-                        ownerId: id
+                        id: id
                     }
                 });
 

@@ -4,7 +4,7 @@ let validateJWT = require('../middleware/validation');
 
 //New Reviews
 router.post('/create', validateJWT, async (req, res) => {
-    const { heroVillain, review, imageURL, like, dislike } = req.body.review
+    const { heroVillain, review, imageURL, like, dislike } = req.body.review;
     const { id, role } = req.user;
     const logReview = {
         heroVillain,
