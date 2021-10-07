@@ -54,7 +54,7 @@ router.get("/mine", validateJWT, async (req, res) => {
             if (User) {
                 const userFavorite = await FavoritesModel.findAll({
                     where: {
-                        id: id
+                        ownerID: id
                     }
                 });
                 res.status(200).json({
@@ -70,7 +70,7 @@ router.get("/mine", validateJWT, async (req, res) => {
             if (User) {
                 const userFavorite = await FavoritesModel.findAll({
                     where: {
-                        id: id
+                        ownerID: id
                     }
                 });
 
@@ -87,15 +87,14 @@ router.get("/mine", validateJWT, async (req, res) => {
 
 // Delete Favorites Item
 router.delete("/delete/:id", validateJWT, async (req, res) => {
-    const { id, role } = req.user.id;
+    const { id, role } = req.user;
     const favoritesId = req.params.id;
 
     try {
         if (role === 'basic') {
-            let User = await AdminModel.findOne({
+            let User = await UserModel.findOne({
                 where: { id: id }
             });
-
             if (User) {
                 const query = {
                     where: {
@@ -115,7 +114,8 @@ router.delete("/delete/:id", validateJWT, async (req, res) => {
             if (User) {
                 const query = {
                     where: {
-                        id: favoritesId
+                        id: favoritesId,
+                        ownerID: id
                     }
                 };
                 await FavoritesModel.destroy(query);

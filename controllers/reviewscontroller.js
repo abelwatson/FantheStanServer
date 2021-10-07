@@ -16,7 +16,9 @@ router.post('/create', validateJWT, async (req, res) => {
     }
     try {
         if (role === 'basic') {
-            let User = await UserModel.findOne({ where: { id: id } });
+            let User = await UserModel.findOne({ 
+                where: { id: id } 
+            });
 
             if (User) {
                 let userReview = await ReviewsModel.create(logReview);
@@ -49,7 +51,7 @@ router.post('/create', validateJWT, async (req, res) => {
 router.put("/update/:id", validateJWT, async (req, res) => {
     const { review } = await req.body.review;
     const reviewId = req.params.id;
-    const { id, role } = req.user.id;
+    const { id, role } = req.user;
 
     try {
         if (role === 'basic') {
@@ -79,6 +81,7 @@ router.put("/update/:id", validateJWT, async (req, res) => {
                     const query = {
                         where: {
                             id: reviewId,
+                            ownerID: id,
                         }
                     };
                     await ReviewsModel.update(updateReview, query);
@@ -95,7 +98,7 @@ router.put("/update/:id", validateJWT, async (req, res) => {
 
 // Delete Review
 router.delete("/delete/:id", validateJWT, async (req, res) => {
-    const { id, role } = req.user.id;
+    const { id, role } = req.user;
     const reviewId = req.params.id;
 
     try {
@@ -123,7 +126,8 @@ router.delete("/delete/:id", validateJWT, async (req, res) => {
             if (User) {
                 const query = {
                     where: {
-                        id: reviewId
+                        id: reviewId,
+                        ownerID: id,
                     }
                 };
 
